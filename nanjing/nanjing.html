@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+
+        <title>PM2.5查询</title>
+		
+        <link rel="stylesheet" type="text/css" href="/css/head.css" media="all" />
+		<link rel="stylesheet" type="text/css" href="/css/middle.css"  />
+        
+		<script type="text/javascript" src="/js/custom.js"></script>
+        <script type="text/javascript" src="/js/wb.js" charset="utf-8"></script>
+		<script type="text/javascript" src="/js/bootstrap/js/jquery.min.js"></script>
+		
+		<!--[if lt IE 9]>
+			<script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+		<![endif]-->
+		
+        <script type="text/javascript" src="/js/amcharts/amcharts.js"></script>
+        <script type="text/javascript" src="/js/amcharts/serial.js"></script>
+        <script type="text/javascript" src="/js/amcharts/themes/dark.js"></script>
+
+        <script type="text/javascript" src="/nanjing/getChartData.php" ></script>
+		<script type="text/javascript" src="/nanjing/getDeviceData.php"></script>
+    </head>
+    
+    <body>
+		<div class="leaf-main-content-wrap">
+			<div class="leaf-main-content">
+				  <div id="site-container" class="context-loader-container">
+					<section id="aws" class="aws-section">
+						<div class="leaf-header-container">
+							<div class="bg-animation">
+								<img alt="Cloud-1" class="cloud cloud-1" src="/images/cloud-1.png" width="300" />
+								<img alt="Cloud-2" class="cloud cloud-2" src="/images/cloud-2.png" width="347" />
+								<img alt="corel" class="cloud corel" src="/images/header_logo.png" width="192">
+
+								<img alt="Cloud-3" class="cloud cloud-3" src="/images/cloud-3.png" width="470" />
+								<img alt="Cloud-4" class="cloud cloud-4" src="/images/cloud-4.png" width="762" />
+								<img alt="Cloud-5" class="cloud cloud-5" src="/images/cloud-5.png" width="587" />
+								<img alt="Cloud-6" class="cloud cloud-6" src="/images/cloud-6.png" width="857" />
+							</div>
+							<div class="htmleaf-header-content">
+
+								<h2>“中国好空气”云数据平台</h2>
+							</div>
+						</div>
+					</section>
+				  </div>
+			</div>
+		</div>
+		
+		<!--主体内容-->
+        <div class="main_width">
+            <div class="main">
+				<div class="panel_table">
+					<p class="panel_table_title">
+						首都机场T2航站楼 各监测点实时数据
+					</p>
+					<div class="pj_area_data">
+						<div class="pj_area_data_title">
+							<span class="pjadt_location">
+								监测站点
+							</span>
+							<a class="pjadt_aqi aqi_arrow_top">
+								<span>
+									PM2.5浓度
+								</span>
+							</a>
+							<span class="pjadt_quality">
+								空气质量状况
+							</span>
+							<div class="clear"></div>
+						</div>
+						<ul id="data_details" class="pj_area_data_details"></ul>
+					</div>
+				</div>
+				<!--曲线图-->
+				<div class="panel_graph" id="panel_graph">
+					<p class="panel_graph_title">
+						首都机场T2航站楼 各监测点数据变化趋势
+					</p>
+					<a class="panel_graph_other" href="/nanjing/setting.html">
+						设置
+					</a>
+					<a class="panel_graph_other" href="/nanjing/query.html">
+						查询
+					</a>
+					<!--曲线图从这里开始,放到这里-->
+					<div id="panel_graph_content"></div>
+				</div>
+			</div>
+			<div class="clear"></div>
+        </div>
+		
+		<!--底部内容-->
+		<div class="footer_width">
+			<div class="footer">
+				<ul>
+					<li>合作单位：上海胜洁空气净化设备有限公司&nbsp;&nbsp;&nbsp;&nbsp;地址：北京市朝阳区建国路93号万达广场3号楼305室&nbsp;&nbsp;&nbsp;&nbsp;电话：010-58207731
+					</li>
+				</ul>
+			</div>
+		</div>
+    </body>
+</html>
+
+<!-- 动态生成table -->
+<script>      
+	function dynamicTable(strJson){  
+		$("#data_details").empty();  
+		 
+		for (var i = 0; i < strJson.length; i++) {    					 			
+			var ulBody = "<li class=\"pj_area_data_item pj_area_data_item_darkbg\">" +
+				"<b></b>" + 
+				"<a class=\"pjadt_location\">" + 
+					strJson[i].AddressName +
+				"</a>" +
+				"<span class=\"pjadt_aqi\">" +
+					 strJson[i].PmValue + "μg/m³" +
+					"<i class=\"\">" + "</i>" +
+				"</span>" +
+				"<span class=\"pjadt_quality\">" +
+					"<em class=" + strJson[i].BgColor + ">" +
+						strJson[i].PmQuality +
+					"</em>" +
+				"</span>" +
+				"<div class=\"clear\"></div>" +
+			"</li>";
+			
+			$("#data_details").append(ulBody);  
+		}  
+		
+		$("li.pj_area_data_item").mouseover(function () { //到达匹配元素的上方，改变css样式
+			$(this).addClass('pj_area_data_item_active');
+		});
+		
+		$("li.pj_area_data_item").mouseout(function () { //鼠标离开，css样式还原
+			$(this).removeClass('pj_area_data_item_active');
+		});
+	}
+</script>
+
+<!-- 曲线图控制 -->
+<script>
+	var TotalDeviceCount = 0;//总设备的个数
+	var GroupCount = 0;//分成几组
+	var MembersCount = 3;//每组几个设备
+	var DeviceArray = new Array();//保存每组有哪些设备
+	var CurrentGroupIndex = 0;//用来切换当前显示的组索引
+	
+	function generateChart(chartDiv, chartData, chartConfig, lineConfigArray) {
+		//定义AmCharts.AmSerialChart对象
+		var chart = new AmCharts.AmSerialChart(AmCharts.themes.light);
+		chart.pathToImages = "/js/images/";
+		chart.dataProvider = chartData;
+		chart.categoryField  = "TriggerTime";//设置横坐标数据                
+		chart.dataDateFormat = "YYYY-MM-DD HH:NN:SS";
+		chart.addClassNames = true;
+		chart.autoDisplay = true;
+		chart.autoMargins = true;
+		chart.fontSize = 12;
+		chart.mouseWheelZoomEnabled = true;
+		chart.colors = ["#ffff00","#ff0000","#ff33cc","#ccff99","#99ffff","#9900cc","#996633","#663399","#6600cc","#333399","#3333ff","#FAEBD7","#E9967A",];
+		
+		//chart.addTitle(chartConfig[0], 12);//设置标题
+
+		//设置横坐标
+		var categoryAxis = chart.categoryAxis;  
+		categoryAxis.minPeriod = "ss";
+		categoryAxis.parseDates = true; 
+		//categoryAxis.title = chartConfig[1];//x轴坐标名称
+		categoryAxis.gridAlpha = 0.28;  
+		categoryAxis.gridColor = "#FFFFFF";//控制垂直栅格线的颜色
+		categoryAxis.axisAlpha = 0;
+		categoryAxis.axisColor = "#FFFFFF";//控制横坐标的颜色
+		categoryAxis.color = "#FFFFFF";//控制横坐标字体的颜色
+		categoryAxis.dashLength = 3;//设置垂直栅格为虚线
+		
+		//设置纵坐标
+		var valueAxis = new AmCharts.ValueAxis();  
+		//valueAxis.title = chartConfig[2]; //设置纵坐标坐标名称
+		valueAxis.titleBold = "true";//设置坐标是否加粗
+		valueAxis.titleColor = "#FFFFFF";//设置纵坐标的文字的颜色
+		valueAxis.titleRotation = 360;//设置纵坐标旋转角度
+		valueAxis.gridAlpha = 0.28;
+		valueAxis.gridColor = "#FFFFFF";//设置水平栅格的颜色
+		valueAxis.axisAlpha = 0.28;
+		valueAxis.axisColor = "#FFFFFF";//设置纵坐标的颜色
+		valueAxis.color = "#FFFFFF";//设置纵坐标字体的颜色
+		valueAxis.dashLength = 3;//设置水平栅格为虚线
+		valueAxis.tickLength = 10;
+		chart.addValueAxis(valueAxis);
+		
+		//创建图表对象graph
+		var i;
+		for (i = 0; i < lineConfigArray.length; i++) {									
+			var graph = new AmCharts.AmGraph();  
+			graph.type = "line";
+			graph.lineThickness = 3;
+			graph.title = lineConfigArray[i].title;  
+			graph.valueField = lineConfigArray[i].valueField; //图表关联数据源中对应的字段值 
+			graph.balloonText = "[[value]]";//设置鼠标移动时的提示数据
+			graph.bullet = "none";//设置打结的图形
+			//graph.labelText = "[[value]]";
+			graph.useLineColorForBulletBorder = true;
+			graph.valueAxis = valueAxis; //图表对应的Y轴 
+			chart.addGraph(graph);  
+		}
+		
+		//设置CURSOR  
+		var chartCursor = new AmCharts.ChartCursor();  
+		chartCursor.zoomable = false;
+		chartCursor.categoryBalloonDateFormat = "JJ:NN:SS";
+		//chartCursor.fullWidth = "true";//设置是显示一条线还是一个矩形
+		chartCursor.bulletsEnabled = "true";
+		chartCursor.cursorColor = "#FFFFFF";
+		chartCursor.categoryBalloonColor = "#FFFFFF";
+		chartCursor.color = "#000000";
+		//chartCursor.pan = true;
+		chart.addChartCursor(chartCursor);
+
+		//添加滑动条
+		/*var chartScrollbar = new AmCharts.ChartScrollbar();
+		chartScrollbar.backgroundAlpha = 0.07;
+		chartScrollbar.backgroundColor = "#FFFFFF";
+		chartScrollbar.selectedBackgroundColor = "#FFFFFF";
+		chartScrollbar.selectedBackgroundAlpha = 0;
+		chart.addChartScrollbar(chartScrollbar);
+	   */
+		//设置LEGEND  
+		var legend = new AmCharts.AmLegend();  
+		legend.align = "left";  
+		legend.useGraphSettings = true;
+		legend.color = "#FFFFFF";
+		legend.fontSize = 12;
+		chart.addLegend(legend);
+
+		//图表输出
+		chart.write(chartDiv);
+	}
+
+	function getJsonData() {
+		$.ajax({
+			type : 'GET',
+			dataType : 'json',
+			data :{"DeviceID":DeviceArray[CurrentGroupIndex++].join(".")},
+			traditional: true,
+			url : '/nanjing/getChartData.php',
+			cache : false,
+			contentType: "application/json;charset=utf-8",
+			success : function (data) {
+				//alert(JSON.stringify(data.Value));
+				dynamicTable(data.TableData);
+				
+				generateChart(
+					'panel_graph_content',
+					data.Value, 
+					['PM2.5 统计表', '时间', '浓度'],
+					data.Field);
+					
+				if(CurrentGroupIndex === GroupCount){
+					CurrentGroupIndex = 0;
+				}
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) { 
+				alert(XMLHttpRequest.responseText); 
+			} 
+		});
+	}
+	
+	function getDeviceInfo() {
+		$.ajax({
+			type : 'GET',
+			dataType : 'json',
+			url : '/nanjing/getDeviceData.php',
+			cache : false,
+			contentType: "application/json;charset=utf-8",
+			success : function (data) {
+				//alert(JSON.stringify(data.value));
+				//alert(data.value.length);
+				TotalDeviceCount = data.value.length;
+				GroupCount = parseInt(TotalDeviceCount / MembersCount);//丢弃小数部分,保留整数部分 
+				
+				if(TotalDeviceCount % MembersCount !== 0){
+					GroupCount++;
+				}
+				
+				for(var i = 0; i < GroupCount; i++){
+					DeviceArray[i] = new Array();
+					for(var j = 0; (j < MembersCount) && (i * MembersCount + j) < TotalDeviceCount; j++){
+						DeviceArray[i][j] = data.value[i * MembersCount + j].device_id;
+					}
+				}
+				
+				getJsonData();
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) { 
+				alert(XMLHttpRequest.responseText); 
+			} 
+		});
+	}
+	
+	AmCharts.ready(function () {
+		getDeviceInfo();
+	});
+
+	window.setInterval("getJsonData()",60000);
+</script> 
+
+<script>
+	window.onresize = function(){
+		window.setTimeout("ResizeWindow()", 300);
+	}
+	
+	function ResizeWindow() {
+		var width = document.documentElement.clientWidth || document.body.clientWidth;
+		document.getElementById("panel_graph").style.width = (width * 0.98 - 50 - 400 - 10 - 50) + "px";  
+		
+		var height = document.documentElement.clientHeight || document.body.clientHeight;
+		if (height > 768) {
+			document.getElementById("panel_graph_content").style.height = (height - 273 - 20 - 20 - 20 - 30 - 50) + "px";
+		}
+	}
+	
+	ResizeWindow();
+</script>

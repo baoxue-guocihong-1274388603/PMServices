@@ -1,0 +1,22 @@
+1.在/etc/init.d/PMServices文件中添加要启动的程序
+
+比如：
+#!/bin/bash
+
+/phpstudy/server/php/bin/php /phpstudy/www/beijing/BeijingGprsTcpServer.php
+/phpstudy/server/php/bin/php /phpstudy/www/Debug/DebugGprsTcpServer.php
+/phpstudy/server/php/bin/php /phpstudy/www/FourParam/MultiParamGprsTcpServer.php
+
+2.每天晚上2:30会自动重启
+可以通过执行crontab -e查看定时任务
+30 2 * * * /sbin/reboot
+
+3.设置开机启动项
+root@iZ118xoe00gZ:/phpstudy/www/beijing# ll /etc/rcS.d/S60PMServices 
+lrwxrwxrwx 1 root root 22 Dec 30 16:39 /etc/rcS.d/S60PMServices -> /etc/init.d/PMServices
+
+开启时系统会启动/etc/rcS.d/S60PMServices服务，本质就是启动/etc/init.d/PMServices
+
+
+阿里云网址账号和密码
+账号371223431@qq.com密码xuyang0622
