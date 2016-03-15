@@ -9,30 +9,30 @@ body{margin:opx;padding:0px;}
 .main{ width:98%; margin:0px auto;}
 
 /*监测点表格*/
-.panel_table{margin:20px 10px 30px 50px;float:left; width:560px; height:auto;}
-.panel_table_title{ font-size:20px; color:#000; margin:10px 0px 30px 0px; text-align:center;}
+.panel_table{margin:20px 10px 30px 50px;float:left; width:600px; height:auto;}
+.panel_table_title{font-family: '宋体';font-size:20px; color:#000; margin:10px 0px 30px 0px; text-align:center;}
 .pj_area_data{border:#e5e5e5 solid 1px;overflow-y:auto;height:auto;}
-.pj_area_data_title{ height:45px; line-height:45px; background-color:#e8e8e8; font-size:18px;}
+.pj_area_data_title{ height:45px; line-height:45px; background-color:#e8e8e8; font-size:18px;font-family: '宋体';}
 .pj_area_data_title span{ float:left; display:inline; color:#555;}
 .pj_area_data_title span.pjadt_location{text-align:left; text-indent:25px;}
 .pj_area_data_title span.pjadt_pm25{text-align:left; text-indent:25px;}
 .pj_area_data_title span.pjadt_co2{text-align:left; text-indent:30px;}
 .pj_area_data_title span.pjadt_tvoc{text-align:left; text-indent:35px;}
-.pj_area_data_title span.pjadt_so2{text-align:left; text-indent:35px;}
-.pj_area_data_title span.pjadt_quality{text-align:left; text-indent:25px;}
+.pj_area_data_title span.pjadt_so2{text-align:left; text-indent:50px;}
+.pj_area_data_title span.pjadt_quality{text-align:left; text-indent:35px;}
 
 ul.pj_area_data_details{list-style-type:none;width:100%;margin:0px;padding:0px;}
 ul.pj_area_data_details li.pj_area_data_item{display:inline; height:45px; line-height:45px;}
-ul.pj_area_data_details li.pj_area_data_item span{float:left; display:inline; color:#555;background-color:#fff; font-size:16px;}
+ul.pj_area_data_details li.pj_area_data_item span{float:left; display:inline; color:#555;background-color:#fff; font-size:16px;font-family: '宋体';}
 
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_location{color:#1e9e69;text-align:left;width:120px;text-indent:25px;}
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_pm25{text-align:left;width:100px;}
-ul.pj_area_data_details li.pj_area_data_item span.pjadt_co2{text-align:left;width:72px;}
-ul.pj_area_data_details li.pj_area_data_item span.pjadt_tvoc{text-align:left;width:60px;}
-ul.pj_area_data_details li.pj_area_data_item span.pjadt_so2{text-align:left;width:70px;}
+ul.pj_area_data_details li.pj_area_data_item span.pjadt_co2{text-align:left;width:60px;}
+ul.pj_area_data_details li.pj_area_data_item span.pjadt_tvoc{text-align:left;width:80px;}
+ul.pj_area_data_details li.pj_area_data_item span.pjadt_so2{text-align:left;width:85px;text-indent:10px;}
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality{text-align:left;width:80px;}
-
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality em{ display:inline-block; width:96px; height:22px; line-height:22px; text-align:left; text-indent:38px;font-style:normal; color:#fff; margin-top:8px; font-size:12px;}
+
 
 
 
@@ -50,8 +50,8 @@ ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality em.pjadt_quality
 
 /*曲线图*/
 .panel_graph{ margin:20px 50px 30px 0px;float:left;}
-.panel_graph_title{ font-size:20px; color:#000; margin:10px 0px 10px 0px; text-align:center;}
-.panel_graph_other{font-size:14px; color:green; margin:0px 0px 5px 0px;float:right;text-decoration:none;padding-left:10px;}
+.panel_graph_title{font-family: '宋体';font-size:20px; color:#000; margin:10px 0px 10px 0px; text-align:center;}
+.panel_graph_other{font-family: '宋体';font-size:14px; color:green; margin:0px 0px 5px 0px;float:right;text-decoration:none;padding-left:10px;}
 #panel_graph_content{width: 100%;height:350px;background-color: #212121;}
 
 /*页面底部*/
@@ -60,7 +60,7 @@ ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality em.pjadt_quality
 .footer_width{position:absolute;bottom:0px;width:100%; height:50px; background:#d9d9d9;margin:0px;padding:0px;}
 .footer{width:100%;}
 .footer ul{list-style-type:none;}
-.footer ul li{color:#000;text-align:center;font-size:16px;}
+.footer ul li{color:#000;text-align:center;font-size:16px;font-family: '宋体';}
 }
 
 /*适应笔记本*/
@@ -68,5 +68,5 @@ ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality em.pjadt_quality
 .footer_width{width:100%; height:50px;margin-top:10px; background:#d9d9d9;padding:0px;}
 .footer{width:100%;}
 .footer ul{list-style-type:none;}
-.footer ul li{color:#000;text-align:center;font-size:16px;}
+.footer ul li{color:#000;text-align:center;font-size:16px;font-family: '宋体';}
 }

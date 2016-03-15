@@ -121,10 +121,10 @@
 					 strJson[i].CO2 + "ppm" +
 				"</span>" +
 				"<span class=\"pjadt_tvoc\">" +
-					 strJson[i].TVOC + "ppm" +
+					 strJson[i].TVOC + "μg/m³" +
 				"</span>" +
 				"<span class=\"pjadt_so2\">" +
-					 strJson[i].SO2 + "ppm" +
+					 strJson[i].SO2 + "μg/m³" +
 				"</span>" +
 				"<span class=\"pjadt_quality\">" +
 					"<em class=" + strJson[i].BgColor + ">" +
@@ -320,7 +320,7 @@
 	
 	function ResizeWindow() {
 		var width = document.documentElement.clientWidth || document.body.clientWidth;
-		document.getElementById("panel_graph").style.width = (width * 0.98 - 50 - 560 - 10 - 50) + "px";  
+		document.getElementById("panel_graph").style.width = (width * 0.98 - 50 - 600 - 10 - 50) + "px";  
 		
 		var height = document.documentElement.clientHeight || document.body.clientHeight;
 		if (height > 768) {

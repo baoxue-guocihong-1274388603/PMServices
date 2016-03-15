@@ -89,8 +89,8 @@
 				$DeviceID = hexdec(substr($ReceiveData, 0, 4));
 				$PmValue = hexdec(substr($ReceiveData, 4, 4));
 				$CO2 = hexdec(substr($ReceiveData, 8, 4));
-				$TVOC = hexdec(substr($ReceiveData, 12, 4));
-				$SO2 = (hexdec(substr($ReceiveData, 16, 4))) / 100;
+				$TVOC = (hexdec(substr($ReceiveData, 12, 4))) * 56 / 50 / 22.4 * 1000;
+				$SO2 = (hexdec(substr($ReceiveData, 16, 4))) * 1000 * 64 / 22.4 / 4 / 100;
 				$TriggerTime = date("Y-m-d H:i:s");
 				$PmQuality = "优";
 				$BgColor = "pjadt_quality_bglevel_1";
@@ -102,6 +102,10 @@
 				echo "TVOC Value:" . $TVOC . PHP_EOL;
 				echo "SO2 Value:" . $SO2 . PHP_EOL;
 				echo "TriggerTime:" . $TriggerTime . PHP_EOL;
+				
+				if ($PmValue >= 1000) {
+					return;
+				}
 				
 				if (($PmValue > 0) && ($PmValue < 35)) {
 					$PmQuality = "优";

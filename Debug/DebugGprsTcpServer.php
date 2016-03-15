@@ -101,6 +101,10 @@
 				echo "Humidity Value:" . $Humidity . PHP_EOL;
 				echo "TriggerTime:" . $TriggerTime . PHP_EOL;
 				
+				if ($PmValue >= 1000) {
+					return;
+				}
+				
 				if (($PmValue > 0) && ($PmValue < 35)) {
 					$PmQuality = "优";
 					$BgColor = "pjadt_quality_bglevel_1";

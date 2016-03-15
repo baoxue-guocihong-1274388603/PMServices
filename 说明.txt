@@ -10,6 +10,9 @@
 2.每天晚上2:30会自动重启
 可以通过执行crontab -e查看定时任务
 30 2 * * * /sbin/reboot
+35 2 * * * /phpstudy/server/php/bin/php /phpstudy/www/beijing/BeijingGprsTcpServer.php
+36 2 * * * /phpstudy/server/php/bin/php /phpstudy/www/Debug/DebugGprsTcpServer.php
+37 2 * * * /phpstudy/server/php/bin/php /phpstudy/www/FourParam/MultiParamGprsTcpServer.php
 
 3.设置开机启动项
 root@iZ118xoe00gZ:/phpstudy/www/beijing# ll /etc/rcS.d/S60PMServices 
