@@ -22,17 +22,11 @@ body{margin:opx;padding:0px;}
 
 
 ul.pj_area_data_details{list-style-type:none;width:100%;margin:0px;padding:0px;}
-
 ul.pj_area_data_details li.pj_area_data_item{display:inline; height:45px; line-height:45px;}
-
 ul.pj_area_data_details li.pj_area_data_item span,ul.pj_area_data_details li.pj_area_data_item a{ float:left; display:inline; color:#555;background-color:#fff; font-size:16px;text-align:center;}
-
 ul.pj_area_data_details li.pj_area_data_item a.pjadt_location{ color:#1e9e69; text-decoration:none;float:left;text-align:left; overflow:hidden; text-indent:20px;}
-
 ul.pj_area_data_details li.pj_area_data_item a.pjadt_location:hover{ font-weight:bold;}
-
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_aqi{ text-align:left; text-indent:30px;}
-
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality em{ display:inline-block; width:96px; height:22px; line-height:22px; text-align:center; font-style:normal; color:#fff; margin-top:8px; font-size:12px; }
 
 ul.pj_area_data_details li.pj_area_data_item a.pjadt_location{ width:35%; }

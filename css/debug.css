@@ -1,6 +1,6 @@
 @CHARSET "UTF-8";
 
-body{margin:opx;padding:0px;}
+body{margin:opx;padding:0px;font-family: '宋体';}
 
 .clear{clear:both;margin:opx;padding:0px;}
 
@@ -29,8 +29,8 @@ ul.pj_area_data_details li.pj_area_data_item span.pjadt_pm25{text-align:left;wid
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_temp{text-align:left;width:90px;}
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_hum{text-align:left;width:60px;}
 ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality{text-align:left;width:100px;}
+ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality em{ display:inline-block; width:96px; height:22px; line-height:22px; text-align:center; font-style:normal; color:#fff;font-size:12px;font-family: '宋体';}
 
-ul.pj_area_data_details li.pj_area_data_item span.pjadt_quality em{ display:inline-block; width:96px; height:22px; line-height:22px; text-align:left; text-indent:38px;font-style:normal; color:#fff; margin-top:8px; font-size:12px;}
 
 
 /*激活li的时候，增加绿色的背景色
