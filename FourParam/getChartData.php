@@ -34,7 +34,7 @@
 		$res = mysqli_query($link,"SELECT monitor_point FROM dtm_deviceinfo_multiparam_table WHERE device_id = '".$row[0]."'");
 		$r = mysqli_fetch_array($res);
 
-		$TableData[] = array("AddressName"=>$r[0],"PmValue"=>$row[1],"CO2"=>$row[2],"TVOC"=>$row[3],"SO2"=>$row[4],"PmQuality"=>$row[6],"BgColor"=>$row[7]);
+		$TableData[] = array("AddressName"=>$r[0],"PmValue"=>$row[1],"CO2"=>$row[2],"TVOC"=>$row[3],"SO2"=>$row[4],"Noise"=>$row[5],"CH2O"=>$row[6],"PmQuality"=>$row[8],"BgColor"=>$row[9]);
 	}
 	
 	if (!empty($FieldData) && !empty($ValueData)) {

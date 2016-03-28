@@ -16,6 +16,7 @@
 		
 		public function __construct() {
 			$this->serv = new swoole_server("139.196.12.213",8085,SWOOLE_PROCESS,SWOOLE_TCP);
+			$this->serv->addlistener("139.196.12.213", 8088, SWOOLE_TCP);
 			
 			$this->serv->set(array(
 				'worker_num' => 3,//设置启动的worker进程数量
@@ -87,22 +88,48 @@
 			for ($i = 0; $i < strlen($str); $i += 20)  {
 				$ReceiveData = substr($str, $i, 20);
 				$DeviceID = hexdec(substr($ReceiveData, 0, 4));
-				$PmValue = hexdec(substr($ReceiveData, 4, 4));
-				$CO2 = hexdec(substr($ReceiveData, 8, 4));
-				$TVOC = (hexdec(substr($ReceiveData, 12, 4))) * 56 / 50 / 22.4 * 1000;
-				$SO2 = (hexdec(substr($ReceiveData, 16, 4))) * 1000 * 64 / 22.4 / 4 / 100;
-				$TriggerTime = date("Y-m-d H:i:s");
-				$PmQuality = "优";
-				$BgColor = "pjadt_quality_bglevel_1";
+				if (($DeviceID % 2) === 0) {//偶数，适用于检测PM2.5 噪音 TVOC 甲醛类型的设备
+					$PmValue = hexdec(substr($ReceiveData, 4, 4));
+					$Noise   = hexdec(substr($ReceiveData, 8, 4));
+					$TVOC    = (hexdec(substr($ReceiveData, 12, 4))) * 56 / 50 / 22.4 * 1000;
+					$CH2O    = (hexdec(substr($ReceiveData, 16, 4))) * 32 / 22.4 / 100 * 1000;
+					
+					$CO2     = "---";
+					$SO2     = "---";
+					
+					$TriggerTime = date("Y-m-d H:i:s");
+					$PmQuality   = "优";
+					$BgColor     = "pjadt_quality_bglevel_1";
+					
+					echo "Receive Data:" . $ReceiveData . PHP_EOL;
+					echo "Device ID:"    . $DeviceID    . PHP_EOL;
+					echo "PM2.5 Value:"  . $PmValue     . PHP_EOL;
+					echo "Noise Value:"  . $Noise       . PHP_EOL;
+					echo "TVOC Value:"   . $TVOC        . PHP_EOL;
+					echo "CH2O Value:"   . $CH2O        . PHP_EOL;
+					echo "TriggerTime:"  . $TriggerTime . PHP_EOL;
+				} else if (($DeviceID % 2) === 1) {//基数，适用于检测PM2.5 CO2 TVOC SO2类型的设备
+					$PmValue = hexdec(substr($ReceiveData, 4, 4));
+					$CO2     = hexdec(substr($ReceiveData, 8, 4));
+					$TVOC    = (hexdec(substr($ReceiveData, 12, 4))) * 56 / 50 / 22.4 * 1000;
+					$SO2     = (hexdec(substr($ReceiveData, 16, 4))) * 1000 * 64 / 22.4 / 4 / 100;
 				
-				echo "Receive Data:" . $ReceiveData . PHP_EOL;
-				echo "Device ID:" . $DeviceID . PHP_EOL;
-				echo "PM2.5 Value:" . $PmValue . PHP_EOL;
-				echo "CO2 Value:" . $CO2 . PHP_EOL;
-				echo "TVOC Value:" . $TVOC . PHP_EOL;
-				echo "SO2 Value:" . $SO2 . PHP_EOL;
-				echo "TriggerTime:" . $TriggerTime . PHP_EOL;
-				
+					$Noise   = "---";
+					$CH2O    = "---";
+					
+					$TriggerTime = date("Y-m-d H:i:s");
+					$PmQuality   = "优";
+					$BgColor     = "pjadt_quality_bglevel_1";
+					
+					echo "Receive Data:" . $ReceiveData . PHP_EOL;
+					echo "Device ID:"    . $DeviceID    . PHP_EOL;
+					echo "PM2.5 Value:"  . $PmValue     . PHP_EOL;
+					echo "CO2 Value:"    . $CO2         . PHP_EOL;
+					echo "TVOC Value:"   . $TVOC        . PHP_EOL;
+					echo "SO2 Value:"    . $SO2         . PHP_EOL;
+					echo "TriggerTime:"  . $TriggerTime . PHP_EOL;
+				}
+								
 				if ($PmValue >= 1000) {
 					return;
 				}
@@ -127,7 +154,7 @@
 					$BgColor = "pjadt_quality_bglevel_6";
 				} 
 				
-				$sql = array('sql' => 'INSERT INTO dtm_pminfo_multiparam_table VALUES(?, ?, ?, ?, ?, ?, ?, ?)', 'param' => array($DeviceID, $PmValue, $CO2, $TVOC, $SO2, $TriggerTime, $PmQuality, $BgColor)); 
+				$sql = array('sql' => 'INSERT INTO dtm_pminfo_multiparam_table VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 'param' => array($DeviceID, $PmValue, $CO2, $TVOC, $SO2, $Noise, $CH2O, $TriggerTime, $PmQuality, $BgColor)); 
 				
 				$serv->task(json_encode($sql)); 
 				sleep(1);//主要用来优化一次可能接收到多个数据包

@@ -68,6 +68,8 @@
 							<span class="pjadt_co2">CO2</span>
 							<span class="pjadt_tvoc">TVOC</span>
 							<span class="pjadt_so2">SO2</span>
+							<span class="pjadt_noise">噪音</span>
+							<span class="pjadt_ch2o">甲醛</span>
 							<span class="pjadt_quality">空气质量状况</span>
 							<div class="clear"></div>
 						</div>
@@ -125,6 +127,12 @@
 				"</span>" +
 				"<span class=\"pjadt_so2\">" +
 					 strJson[i].SO2 + "μg/m³" +
+				"</span>" +
+				"<span class=\"pjadt_noise\">" +
+					 strJson[i].Noise + "db" +
+				"</span>" +
+				"<span class=\"pjadt_ch2o\">" +
+					 strJson[i].CH2O + "μg/m³" +
 				"</span>" +
 				"<span class=\"pjadt_quality\">" +
 					"<em class=" + strJson[i].BgColor + ">" +
@@ -320,7 +328,7 @@
 	
 	function ResizeWindow() {
 		var width = document.documentElement.clientWidth || document.body.clientWidth;
-		document.getElementById("panel_graph").style.width = (width * 0.98 - 50 - 600 - 10 - 50) + "px";  
+		document.getElementById("panel_graph").style.width = (width * 0.98 - 50 - 650 - 10 - 50) + "px";  
 		
 		var height = document.documentElement.clientHeight || document.body.clientHeight;
 		if (height > 768) {
