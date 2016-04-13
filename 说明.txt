@@ -1,25 +1,25 @@
-1.ÔÚ/etc/init.d/PMServicesÎÄ¼şÖĞÌí¼ÓÒªÆô¶¯µÄ³ÌĞò
+1.åœ¨/etc/init.d/PMServicesæ–‡ä»¶ä¸­æ·»åŠ è¦å¯åŠ¨çš„ç¨‹åº
 
-±ÈÈç£º
+æ¯”å¦‚ï¼š
 #!/bin/bash
 
 /phpstudy/server/php/bin/php /phpstudy/www/beijing/BeijingGprsTcpServer.php
 /phpstudy/server/php/bin/php /phpstudy/www/Debug/DebugGprsTcpServer.php
 /phpstudy/server/php/bin/php /phpstudy/www/FourParam/MultiParamGprsTcpServer.php
 
-2.Ã¿ÌìÍíÉÏ2:30»á×Ô¶¯ÖØÆô
-¿ÉÒÔÍ¨¹ıÖ´ĞĞcrontab -e²é¿´¶¨Ê±ÈÎÎñ
+2.æ¯å¤©æ™šä¸Š2:30ä¼šè‡ªåŠ¨é‡å¯
+å¯ä»¥é€šè¿‡æ‰§è¡Œcrontab -eæŸ¥çœ‹å®šæ—¶ä»»åŠ¡
 30 2 * * * /sbin/reboot
 35 2 * * * /phpstudy/server/php/bin/php /phpstudy/www/beijing/BeijingGprsTcpServer.php
 36 2 * * * /phpstudy/server/php/bin/php /phpstudy/www/Debug/DebugGprsTcpServer.php
 37 2 * * * /phpstudy/server/php/bin/php /phpstudy/www/FourParam/MultiParamGprsTcpServer.php
 
-3.ÉèÖÃ¿ª»úÆô¶¯Ïî
+3.è®¾ç½®å¼€æœºå¯åŠ¨é¡¹
 root@iZ118xoe00gZ:/phpstudy/www/beijing# ll /etc/rcS.d/S60PMServices 
 lrwxrwxrwx 1 root root 22 Dec 30 16:39 /etc/rcS.d/S60PMServices -> /etc/init.d/PMServices
 
-¿ªÆôÊ±ÏµÍ³»áÆô¶¯/etc/rcS.d/S60PMServices·şÎñ£¬±¾ÖÊ¾ÍÊÇÆô¶¯/etc/init.d/PMServices
+å¼€å¯æ—¶ç³»ç»Ÿä¼šå¯åŠ¨/etc/rcS.d/S60PMServicesæœåŠ¡ï¼Œæœ¬è´¨å°±æ˜¯å¯åŠ¨/etc/init.d/PMServices
 
 
-°¢ÀïÔÆÍøÖ·ÕËºÅºÍÃÜÂë
-ÕËºÅ371223431@qq.comÃÜÂëxuyang0622
+é˜¿é‡Œäº‘ç½‘å€è´¦å·å’Œå¯†ç 
+è´¦å·371223431@qq.comå¯†ç xuyang0622

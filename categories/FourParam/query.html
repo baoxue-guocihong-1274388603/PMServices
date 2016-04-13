@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>查询</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+
+    <script type="text/javascript" src="/js/calendar/laydate.js"></script>
+    <script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/amcharts/amcharts.js"></script>
+    <script type="text/javascript" src="/js/amcharts/serial.js"></script>
+    <script type="text/javascript" src="/js/amcharts/themes/dark.js"></script>
+
+    <script type="text/javascript" src="/categories/FourParam/getDeviceData.php"></script>
+    <script type="text/javascript" src="/categories/FourParam/getHistoryRecord.php"></script>
+
+    <!--[if lt IE 9]>
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <style type="text/css">
+        body {
+            margin: opx;
+            padding: 0px;
+        }
+
+        .main_width {
+            width: 100%;
+        }
+
+        .main {
+            width: 98%;
+            margin: 20px auto;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        span, input {
+            font-size: 18px;
+            height: 60px;
+            margin-right: 20px;
+        }
+
+        select, button {
+            font-size: 18px;
+            height: 30px;
+            margin-right: 20px;
+        }
+
+        #panel_graph_content, #panel_graph_content_avg {
+            margin-top: 10px;
+            width: 100%;
+            height: 450px;
+            background-color: #212121;
+        }
+    </style>
+    <title>记录查询</title>
+</head>
+<body>
+<!-- 主体内容 -->
+<div class="main_width">
+    <div class="main">
+        <div>
+            <h2>各监测点实时数据</h2>
+            <div class="top_header">
+                <span>起始时间:</span>
+                <input placeholder="请选择起始日期" class="laydate-icon"
+                       onClick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" id="StartTime">
+                <span>结束时间:</span>
+                <input placeholder="请选择结束日期" class="laydate-icon"
+                       onClick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" id="EndTime">
+                <span>设备:</span>
+                <select id="Select"></select>
+                <button type="button" id="btnQuery">查询</button>
+            </div>
+            <!--曲线图从这里开始,放到这里-->
+            <div id="panel_graph_content"></div>
+        </div>
+        <div>
+            <h2>各监测点数据日平均值</h2>
+            <div class="bottom_header">
+                <span>起始时间:</span>
+                <input placeholder="请选择起始日期" class="laydate-icon"
+                       onClick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" id="StartTimeAvg">
+                <span>结束时间:</span>
+                <input placeholder="请选择结束日期" class="laydate-icon"
+                       onClick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})" id="EndTimeAvg">
+                <span>设备:</span>
+                <select id="SelectAvg"></select>
+                <button type="button" id="btnQueryAvg">查询</button>
+            </div>
+            <!--曲线图从这里开始,放到这里-->
+            <div id="panel_graph_content_avg"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<!-- 动态生成table -->
+<script type="text/javascript">
+    function dynamicTable(strJson) {
+        for (var i = 0; i < strJson.length; i++) {
+            var option = "<option>" + strJson[i].device_id + "</option>";
+
+            $("select").append(option);
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/categories/FourParam/getDeviceData.php',
+            data: "OperationType=GetDeviceInfo",
+            dataType: 'json',//代表服务器返回的数据是json类型,并不是我们发生过去的数据类型也必须为json
+            cache: false,
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                dynamicTable(data.value);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.responseText);
+            }
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    !function () {
+        laydate.skin('molv'); //切换皮肤，请查看skins下面皮肤库
+        laydate({elem: '#demo'}); //绑定元素
+    }();
+</script>
+
+<!-- 曲线图控制 -->
+<script>
+    function generateChart(chartDiv, chartData, chartConfig, lineConfigArray) {
+        //定义AmCharts.AmSerialChart对象
+        var chart = new AmCharts.AmSerialChart(AmCharts.themes.light);
+        chart.pathToImages = "/js/images/";
+        chart.dataProvider = chartData;
+        chart.categoryField = "TriggerTime";//设置横坐标数据
+        chart.dataDateFormat = "YYYY-MM-DD HH:NN:SS";
+        chart.addClassNames = true;
+        chart.autoDisplay = true;
+        chart.autoMargins = true;
+        chart.fontSize = 12;
+        chart.mouseWheelZoomEnabled = true;
+        chart.colors = ["#ffff00", "#ff0000", "#ff33cc", "#ccff99", "#99ffff", "#9900cc", "#996633", "#663399", "#6600cc", "#333399", "#3333ff", "#FAEBD7", "#E9967A",];
+
+        //chart.addTitle(chartConfig[0], 12);//设置标题
+
+        //设置横坐标
+        var categoryAxis = chart.categoryAxis;
+        categoryAxis.minPeriod = "ss";
+        categoryAxis.parseDates = true;
+        //categoryAxis.title = chartConfig[1];//x轴坐标名称
+        categoryAxis.gridAlpha = 0.28;
+        categoryAxis.gridColor = "#FFFFFF";//控制垂直栅格线的颜色
+        categoryAxis.axisAlpha = 0;
+        categoryAxis.axisColor = "#FFFFFF";//控制横坐标的颜色
+        categoryAxis.color = "#FFFFFF";//控制横坐标字体的颜色
+        categoryAxis.dashLength = 3;//设置垂直栅格为虚线
+
+        //设置纵坐标
+        var valueAxis = new AmCharts.ValueAxis();
+        //valueAxis.title = chartConfig[2]; //设置纵坐标坐标名称
+        valueAxis.titleBold = "true";//设置坐标是否加粗
+        valueAxis.titleColor = "#FFFFFF";//设置纵坐标的文字的颜色
+        valueAxis.titleRotation = 360;//设置纵坐标旋转角度
+        valueAxis.gridAlpha = 0.28;
+        valueAxis.gridColor = "#FFFFFF";//设置水平栅格的颜色
+        valueAxis.axisAlpha = 0.28;
+        valueAxis.axisColor = "#FFFFFF";//设置纵坐标的颜色
+        valueAxis.color = "#FFFFFF";//设置纵坐标字体的颜色
+        valueAxis.dashLength = 3;//设置水平栅格为虚线
+        valueAxis.tickLength = 10;
+        chart.addValueAxis(valueAxis);
+
+        //创建图表对象graph
+        var i;
+        for (i = 0; i < lineConfigArray.length; i++) {
+            var graph = new AmCharts.AmGraph();
+            graph.type = "line";
+            graph.lineThickness = 3;
+            graph.title = lineConfigArray[i].title;
+            graph.valueField = lineConfigArray[i].valueField; //图表关联数据源中对应的字段值
+            graph.balloonText = "[[value]]";//设置鼠标移动时的提示数据
+            graph.bullet = "none";//设置打结的图形
+            //graph.labelText = "[[value]]";
+            graph.useLineColorForBulletBorder = true;
+            graph.valueAxis = valueAxis; //图表对应的Y轴
+            chart.addGraph(graph);
+        }
+
+        //设置CURSOR
+        var chartCursor = new AmCharts.ChartCursor();
+        chartCursor.zoomable = false;
+        chartCursor.categoryBalloonDateFormat = "JJ:NN:SS";
+        //chartCursor.fullWidth = "true";//设置是显示一条线还是一个矩形
+        chartCursor.bulletsEnabled = "true";
+        chartCursor.cursorColor = "#FFFFFF";
+        chartCursor.categoryBalloonColor = "#FFFFFF";
+        chartCursor.color = "#000000";
+        //chartCursor.pan = true;
+        chart.addChartCursor(chartCursor);
+
+        //添加滑动条
+        /*var chartScrollbar = new AmCharts.ChartScrollbar();
+         chartScrollbar.backgroundAlpha = 0.07;
+         chartScrollbar.backgroundColor = "#FFFFFF";
+         chartScrollbar.selectedBackgroundColor = "#FFFFFF";
+         chartScrollbar.selectedBackgroundAlpha = 0;
+         chart.addChartScrollbar(chartScrollbar);
+         */
+        //设置LEGEND
+        var legend = new AmCharts.AmLegend();
+        legend.align = "left";
+        legend.useGraphSettings = true;
+        legend.color = "#FFFFFF";
+        legend.fontSize = 12;
+        chart.addLegend(legend);
+
+        //图表输出
+        chart.write(chartDiv);
+    }
+</script>
+
+<!-- 曲线图控制 -->
+<script>
+    function generateChartAvg(chartDiv, chartData, chartConfig, lineConfigArray) {
+        //定义AmCharts.AmSerialChart对象
+        var chart = new AmCharts.AmSerialChart(AmCharts.themes.light);
+        chart.pathToImages = "/js/images/";
+        chart.dataProvider = chartData;
+        chart.categoryField = "TriggerTime";//设置横坐标数据
+        chart.dataDateFormat = "YYYY-MM-DD";
+        chart.addClassNames = true;
+        chart.autoDisplay = true;
+        chart.autoMargins = true;
+        chart.fontSize = 12;
+        chart.mouseWheelZoomEnabled = true;
+        chart.colors = ["#ffff00", "#ff0000", "#ff33cc", "#ccff99", "#99ffff", "#9900cc", "#996633", "#663399", "#6600cc", "#333399", "#3333ff", "#FAEBD7", "#E9967A",];
+
+        //chart.addTitle(chartConfig[0], 12);//设置标题
+
+        //设置横坐标
+        var categoryAxis = chart.categoryAxis;
+        categoryAxis.minPeriod = "DD";
+        categoryAxis.parseDates = true;
+        //categoryAxis.title = chartConfig[1];//x轴坐标名称
+        categoryAxis.gridAlpha = 0.28;
+        categoryAxis.gridColor = "#FFFFFF";//控制垂直栅格线的颜色
+        categoryAxis.axisAlpha = 0;
+        categoryAxis.axisColor = "#FFFFFF";//控制横坐标的颜色
+        categoryAxis.color = "#FFFFFF";//控制横坐标字体的颜色
+        categoryAxis.dashLength = 3;//设置垂直栅格为虚线
+
+        //设置纵坐标
+        var valueAxis = new AmCharts.ValueAxis();
+        //valueAxis.title = chartConfig[2]; //设置纵坐标坐标名称
+        valueAxis.titleBold = "true";//设置坐标是否加粗
+        valueAxis.titleColor = "#FFFFFF";//设置纵坐标的文字的颜色
+        valueAxis.titleRotation = 360;//设置纵坐标旋转角度
+        valueAxis.gridAlpha = 0.28;
+        valueAxis.gridColor = "#FFFFFF";//设置水平栅格的颜色
+        valueAxis.axisAlpha = 0.28;
+        valueAxis.axisColor = "#FFFFFF";//设置纵坐标的颜色
+        valueAxis.color = "#FFFFFF";//设置纵坐标字体的颜色
+        valueAxis.dashLength = 3;//设置水平栅格为虚线
+        valueAxis.tickLength = 10;
+        chart.addValueAxis(valueAxis);
+
+        //创建图表对象graph
+        var i;
+        for (i = 0; i < lineConfigArray.length; i++) {
+            var graph = new AmCharts.AmGraph();
+            graph.type = "line";
+            graph.lineThickness = 3;
+            graph.title = lineConfigArray[i].title;
+            graph.valueField = lineConfigArray[i].valueField; //图表关联数据源中对应的字段值
+            graph.balloonText = "[[value]]";//设置鼠标移动时的提示数据
+            graph.bullet = "none";//设置打结的图形
+            //graph.labelText = "[[value]]";
+            graph.useLineColorForBulletBorder = true;
+            graph.valueAxis = valueAxis; //图表对应的Y轴
+            chart.addGraph(graph);
+        }
+
+        //设置CURSOR
+        var chartCursor = new AmCharts.ChartCursor();
+        chartCursor.zoomable = false;
+        chartCursor.categoryBalloonDateFormat = "YYYY-MM-DD";
+        //chartCursor.fullWidth = "true";//设置是显示一条线还是一个矩形
+        chartCursor.bulletsEnabled = "true";
+        chartCursor.cursorColor = "#FFFFFF";
+        chartCursor.categoryBalloonColor = "#FFFFFF";
+        chartCursor.color = "#000000";
+        //chartCursor.pan = true;
+        chart.addChartCursor(chartCursor);
+
+        //设置LEGEND
+        var legend = new AmCharts.AmLegend();
+        legend.align = "left";
+        legend.useGraphSettings = true;
+        legend.color = "#FFFFFF";
+        legend.fontSize = 12;
+        chart.addLegend(legend);
+
+        //图表输出
+        chart.write(chartDiv);
+    }
+</script>
+
+<script type="text/javascript">
+    $("#btnQuery").click(function () {
+        var StartTime = $("#StartTime");
+        var EndTime = $("#EndTime");
+        var msg = "";
+        if ($.trim(StartTime.val()) === "") {
+            msg = "请选择起始日期";
+        } else if ($.trim(EndTime.val()) === "") {
+            msg = "请选择结束日期";
+        }
+
+        if (msg !== "") {
+            alert(msg);
+        } else {
+            $.ajax({
+                type: "GET",
+                url: "/categories/FourParam/getHistoryRecord.php",
+                data: "Type=Normal" + "&StartTime=" + $.trim(StartTime.val()) +
+                "&EndTime=" + $.trim(EndTime.val()) + "&DeviceID=" + $.trim($("#Select").val()),
+                dataType: "json",
+                cache: false,
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    //alert(JSON.stringify(data.Field));
+                    generateChart(
+                            'panel_graph_content',
+                            data.Value,
+                            ['PM2.5 统计表', '时间', '浓度'],
+                            data.Field);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(XMLHttpRequest.responseText);
+                }
+            });
+        }
+    });
+</script>
+
+<script type="text/javascript">
+    $("#btnQueryAvg").click(function () {
+        var StartTimeAvg = $("#StartTimeAvg");
+        var EndTimeAvg = $("#EndTimeAvg");
+        var msg = "";
+        if ($.trim(StartTimeAvg.val()) === "") {
+            msg = "请选择起始日期";
+        } else if ($.trim(EndTimeAvg.val()) === "") {
+            msg = "请选择结束日期";
+        }
+
+        if (msg !== "") {
+            alert(msg);
+        } else {
+            $.ajax({
+                type: "GET",
+                url: "/categories/FourParam/getHistoryRecord.php",
+                data: "Type=Avarge" + "&StartTime=" + $.trim(StartTimeAvg.val()) +
+                "&EndTime=" + $.trim(EndTimeAvg.val()) + "&DeviceID=" + $.trim($("#SelectAvg").val()),
+                dataType: "json",
+                cache: false,
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    //alert(JSON.stringify(data.Value));
+                    generateChartAvg(
+                            'panel_graph_content_avg',
+                            data.Value,
+                            ['PM2.5 统计表', '时间', '浓度'],
+                            data.Field);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(XMLHttpRequest.responseText);
+                }
+            });
+        }
+    });
+</script>

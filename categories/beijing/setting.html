@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>监测点设置</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no"/>
+
+    <script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/bootstrap/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/js/dtGrid/jquery.dtGrid.js"></script>
+    <script type="text/javascript" src="/js/dtGrid/i18n/zh-cn.js"></script>
+    <script type="text/javascript" src="/js/dtGrid/dependents/datePicker/WdatePicker.js" defer="defer"></script>
+    <script type="type/javascript" src="/categories/beijing/getDeviceData.php"></script>
+
+    <!--[if lt IE 9]>
+    <script src="/js/dtGrid/dependents/bootstrap/plugins/ie/html5shiv.js"></script>
+    <script src="/js/dtGrid/dependents/bootstrap/plugins/ie/respond.js"></script>
+    <![endif]-->
+
+    <!--[if lt IE 8]>
+    <script src="/js/dtGrid/dependents/bootstrap/plugins/ie/json2.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="/js/dtGrid/dependents/fontAwesome/css/font-awesome.min.css"
+          media="all"/>
+    <link rel="stylesheet" type="text/css" href="/js/dtGrid/jquery.dtGrid.css"/>
+    <link rel="stylesheet" type="text/css" href="/js/dtGrid/dependents/datePicker/skin/WdatePicker.css"/>
+    <link rel="stylesheet" type="text/css" href="/js/dtGrid/dependents/datePicker/skin/default/datepicker.css"/>
+    <link rel="stylesheet" type="text/css" href="http://libs.baidu.com/bootstrap/3.0.3/css/bootstrap.min.css"/>
+
+    <style>
+        .main_width {
+            margin: 20px;
+            font-size: 15px;
+            background-color: white;
+        }
+
+        #DeviceID, #MonitorPoint {
+            display: inline;
+            color: #555555;
+            background-color: #ffffff;
+            background-image: none;
+            border: 1px solid #cccccc;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+            -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            vertical-align: middle;
+            padding: 10px 16px;
+            font-size: 15px;
+            line-height: 1.33;
+            border-radius: 10px;
+            margin-right: 5px;
+            text-align: center;
+        }
+
+        #DeviceID:focus, #MonitorPoint:focus {
+            border-color: #66afe9;
+            outline: 0;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6);
+            box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(102, 175, 233, 0.6);
+        }
+
+        #btnAddDevice, #btnDeleteDevice {
+            display: inline;
+            margin-bottom: 0;
+            font-weight: normal;
+            text-align: center;
+            vertical-align: middle;
+            touch-action: manipulation;
+            cursor: pointer;
+            background-image: none;
+            border: 1px solid transparent;
+            white-space: nowrap;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            color: #ffffff;
+            background-color: #5cb85c;
+            border-color: #4cae4c;
+            padding: 10px 16px;
+            font-size: 15px;
+            line-height: 1.33;
+            border-radius: 10px;
+        }
+
+        #btnDeleteDevice {
+            margin-right: 0px;
+        }
+
+        #btnAddDevice:hover, #btnDeleteDevice:hover {
+            color: #ffffff;
+            background-color: #449d44;
+            border-color: #398439;
+        }
+
+        #btnDeleteDevice:hover {
+            color: #ffffff;
+            background-color: red;
+            border-color: red;
+        }
+
+        #main_content {
+            overflow-y: auto;
+            overflow-x: hidden;
+            height: 500px;
+            margin-top: 10px;
+            margin-bottom: 0px;
+        }
+
+    </style>
+</head>
+<body>
+<!-- 主体内容 -->
+<div class="main_width">
+    <div class="main">
+        <form id="BindDeviceForm">
+            <label>设备地址:</label>
+            <input type="text" id="DeviceID" name="DeviceID"/>
+
+            <label>监测站点名称:</label>
+            <input type="text" id="MonitorPoint" name="MonitorPoint"/>
+
+            <button type="button" id="btnAddDevice">添加</button>
+        </form>
+        <div id="main_content">
+            <div id="dtGridContainer" class="dt-grid-container"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script type="text/javascript">
+    var dtGridColumns = [
+        {
+            id: 'index', title: '序号', type: 'string', columnClass: 'text-center',
+            resolution: function (value, record, column, grid, dataNo, columnNo) {
+                var content = '<lable>' + ++dataNo + '</lable>';
+                return content;
+            }
+        },
+        {id: 'device_id', title: '设备地址', type: 'string', columnClass: 'text-center'},
+        {id: 'monitor_point', title: '监测站点', type: 'string', columnClass: 'text-center'},
+        {
+            id: 'operation', title: '操作', type: 'string', columnClass: 'text-center',
+            resolution: function (value, record, column, grid, dataNo, columnNo) {
+                var content = "<button class=\"btn btn-xs btn-danger\"" +
+                        "onclick=DeleteDevice(" + record.device_id + ")>" +
+                        "<i class=\"fa fa-trash-o\"></i> 删除</button>";
+
+                return content;
+            }
+        }
+    ];
+
+    var dtGridOption = {
+        lang: 'zh-cn',
+        ajaxLoad: false,
+        exportFileName: '设备列表',
+        columns: dtGridColumns,
+        gridContainer: 'dtGridContainer',
+        datas: '',
+        pageSize: 10000
+    };
+
+    $("#btnAddDevice").click(function () {
+        var DeviceID = $("#DeviceID");
+        var MonitorPoint = $("#MonitorPoint");
+        var msg = "";
+        if ($.trim(DeviceID.val()) === "") {
+            msg = "设备地址不能为空";
+            DeviceID.focus();
+        } else if ($.trim(MonitorPoint.val()) === "") {
+            msg = "监测站点不能为空！";
+            MonitorPoint.focus();
+        }
+
+        if (msg !== "") {
+            alert(msg);
+        } else {
+            $.ajax({
+                type: "GET",
+                url: "/categories/beijing/getDeviceData.php",
+                data: "OperationType=AddDevice&DeviceID=" + $.trim(DeviceID.val()) +
+                "&MonitorPoint=" + encodeURIComponent($.trim(MonitorPoint.val())),
+                dataType: "json",
+                cache: false,
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    alert(data.status);
+                    $('#dtGridContainer').empty();
+                    dtGridOption.datas = data.value;
+                    var grid = $.fn.DtGrid.init(dtGridOption);
+                    grid.load();
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(XMLHttpRequest.responseText);
+                }
+            });
+        }
+    });
+
+    function DeleteDevice(device_id) {
+        $.ajax({
+            type: "GET",
+            url: "/categories/beijing/getDeviceData.php",
+            data: "OperationType=DeleteDevice&DeviceID=" + device_id,
+            dataType: "json",
+            cache: false,
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                alert("设备" + device_id + ":" + data.status);
+                $('#dtGridContainer').empty();
+                dtGridOption.datas = data.value;
+                var grid = $.fn.DtGrid.init(dtGridOption);
+                grid.load();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.responseText);
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        $.ajax({
+            type: 'GET',
+            url: '/categories/beijing/getDeviceData.php',
+            data: "OperationType=GetDeviceInfo",
+            dataType: 'json',//代表服务器返回的数据是json类型,并不是我们发生过去的数据类型也必须为json
+            cache: false,
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                $('#dtGridContainer').empty();
+                dtGridOption.datas = data.value;
+                var grid = $.fn.DtGrid.init(dtGridOption);
+                grid.load();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest.responseText);
+            }
+        });
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        var height = document.documentElement.clientHeight || document.body.clientHeight;
+        document.getElementById("main_content").style.height = (height - 20 - 50 - 10 - 20) + "px";
+    });
+</script>
